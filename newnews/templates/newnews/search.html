@@ -1,0 +1,95 @@
+{% extends 'newnews/default.html' %}
+{% load custom_filters %}
+
+{{% block title %} Поиск {% endblock title %}
+
+{% block content %}
+<h1>Поиск новостей</h1>
+<form method="GET">
+    {{ filter.form }} <!-- Форму от фильтров за нас сделает django. А вот кнопку, увы придётся делать самому -->
+    <input type="submit" value="Найти">
+</form>
+
+
+
+<h3>Количество новостей всего: {{ news|length }}</h3>
+
+    <hr>
+    {% if news %}
+        <table>
+            <tr>
+                <td>
+                    <h4>Заголовок</h4>
+                </td>
+                <td>
+                    <h4>Автор</h4>
+                </td>
+                <td>
+                    <h4>Дата публикации</h4>
+                </td>
+                <td>
+                    <h4>Описание</h4>
+                </td>
+                <td>
+                    <h4>Тип</h4>
+                </td>
+                <td>
+                    <h4>Рейтинг</h4>
+                </td>
+            </tr>
+        {% for news_detail in news %}
+            <tr>
+                <td>
+                    <a href="{% url 'news_detail' news_detail.id %}">{{ news_detail.Post_title }}</a>
+                    <a href="{% url 'news_create' news_detail.id %}"><u>Редактировать</u></a>
+                    <a href="{% url 'news_delete' news_detail.id %}"><u> Удалить </u></a>
+                </td>
+                 <td>
+                    {{ news_detail.author }}
+                </td>
+                <td>
+                    {{ news_detail.Post_time|date:'d-M-Y h:m:s'}}
+                </td>
+                <td>
+                    {{ news_detail.Post_text|truncatechars:50 }}
+                </td>
+                <td>
+                    {{ news_detail.Post_type }}
+                </td>
+                <td>
+                    {{ news_detail.Post_rating }}
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+{% else %}
+    <h2>Новостей нет!</h2>
+    {% endif %}
+
+
+{% if is_paginated %}
+{% if page_obj.has_previous %}
+        <a href="?page=1">Первая</a>
+        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
+    {% endif %}
+
+    <!-- Показываем только текущую страницу и ближайшие к ней, чтобы список не тянулся и не захламлял страницу -->
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a>{{ num }}</a>
+        {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    <!-- Если есть следующая страница, то даём ссылку на неё и на самую последнюю страницу -->
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Последняя</a>
+    {% endif %}
+
+{% endif %}
+
+
+<! -- конец контента -->
+{% endblock content %}

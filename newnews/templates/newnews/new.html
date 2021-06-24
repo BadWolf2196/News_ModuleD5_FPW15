@@ -1,0 +1,15 @@
+{% extends 'newnews/default.html' %}
+
+
+{% block title %}
+{{ new }}
+{% endblock title %}
+
+{% block content %}
+    {{ new.Post_title }}
+    {{ new.author }}
+    {{ new.Post_time|date:'d-M-Y h:m:s' }}
+    {{ new.Post_text|truncatechars:50 }}
+    {{ new.Post_type }}
+    {{ new.Post_rating }}
+{% endblock content %}
